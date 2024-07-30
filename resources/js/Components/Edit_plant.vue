@@ -4,11 +4,8 @@ import { router, useForm, usePage } from '@inertiajs/vue3';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import Droplet from "./Droplet.vue";
-import Sun from "./Sun.vue";
-
-const filepath = ref("pic.png");
-const file_upld = ref(false);
+import Droplet from "@/Components/Droplet.vue";
+import Sun from "@/Components/Sun.vue";
 
 const emits = defineEmits(['close']);
 const props = defineProps({
@@ -16,7 +13,10 @@ const props = defineProps({
         type: Object,
     }
 })
-const user = usePage().props.auth.user;
+
+const Plant = ref();
+const filepath = ref("pic.png");
+const file_upld = ref(false);
 
 function initializeForm() {
     if (props.tempPlant) {
@@ -45,37 +45,36 @@ function initializeForm() {
 
 function colorw(index) {
     // activeIndexw.value = index;
-    Plant.water = index;
+    Plant.value.water = index;
 }
 
 // const activeIndexs = ref(-1);
 function colors(index) {
     // activeIndexs.value = index;
-    Plant.sunlight = index;
+    Plant.value.sunlight = index;
 }
 
 function handleFileChange(event) {
     const input = event.target;
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
-        Plant.plant_pic = file;
+        Plant.value.plant_pic = file;
 
         // Read the file and save the path
         const reader = new FileReader();
         reader.onload = function (e) {
-            Plant.plant_path = file.name;
+            Plant.value.plant_path = file.name;
         };
         reader.readAsDataURL(file);
         filepath.value = URL.createObjectURL(file);
         file_upld.value = true;
     }
 }
-const Plant = initializeForm();
+
 watch(() => props.tempPlant, (newVal) => {
     Plant.value = initializeForm();
     file_upld.value = false;
-}, { deep: true });
-
+});
 
 function reset() {
     Plant.value = initializeForm();
@@ -85,21 +84,20 @@ function reset() {
 
 function Update() {
     const formData = new FormData();
-    formData.append("name", Plant.name);
-    formData.append("species", Plant.species);
-    formData.append("water", Plant.water);
-    formData.append("date", Plant.date);
-    formData.append("soil", Plant.soil);
-    formData.append("drainage", Plant.drainage);
-    formData.append("fertilizer", Plant.fertilizer);
-    formData.append("sunlight", Plant.sunlight);
-    formData.append("humidity", Plant.humidity);
-    formData.append("notes", Plant.notes);
+    formData.append("name", Plant.value.name);
+    formData.append("species", Plant.value.species);
+    formData.append("water", Plant.value.water);
+    formData.append("date", Plant.value.date);
+    formData.append("soil", Plant.value.soil);
+    formData.append("drainage", Plant.value.drainage);
+    formData.append("fertilizer", Plant.value.fertilizer);
+    formData.append("sunlight", Plant.value.sunlight);
+    formData.append("humidity", Plant.value.humidity);
+    formData.append("notes", Plant.value.notes);
     formData.append("_method", "PATCH");
-
-    if (Plant.plant_pic) {
-        formData.append("plant_path", Plant.plant_path);
-        formData.append("plant_pic", Plant.plant_pic);
+    if (Plant.value.plant_pic) {
+        formData.append("plant_path", Plant.value.plant_path);
+        formData.append("plant_pic", Plant.value.plant_pic);
     }
     router.post(route('plants.update', props.tempPlant.id), formData, {
         onSuccess: () => {
@@ -107,7 +105,7 @@ function Update() {
             reset();
         },
         onError: (errors) => {
-            console.log(errors); // Add error logging for debugging
+            console.error(errors); // Add error logging for debugging
         }
     });
 }

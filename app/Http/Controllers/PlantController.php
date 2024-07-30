@@ -33,13 +33,13 @@ class PlantController extends Controller
     }
     public function update(PlantUpdateRequest $request, $id)
     {
+        // dd($request->all());
 
         $plant = Plant::findOrFail($id); // Find the plant by its ID
 
         if ($plant->user_id !== Auth::id()) {
             abort(403); // Ensure the plant belongs to the authenticated user
         }
-
         $plant->name = $request->input('name');
         $plant->species = $request->input('species');
         $plant->water = $request->input('water');
@@ -55,8 +55,12 @@ class PlantController extends Controller
             // Delete old plant picture if exists
             if ($plant->plant_path) {
                 $path = $plant->plant_path;
-                $plant->plant_path = $request->file('plant_pic')->store('plant_pics', 'public');
-                Storage::disk('public')->delete($path);
+                if ($path !== "pic.png") {
+                    $plant->plant_path = $request->file('plant_pic')->store('plant_pics', 'public');
+                    Storage::disk('public')->delete($path);
+                } else {
+                    $plant->plant_path = $request->file('plant_pic')->store('plant_pics', 'public');
+                }
             }
             // Store new plant picture
             else {
@@ -70,9 +74,58 @@ class PlantController extends Controller
         // return response()->json(['success' => true, 'message' => 'Plant updated successfully']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        // Get paginated plants for the user
+        // dd($request->SortOrder , $request->SortField);
+        $query = Plant::where('user_id', Auth::id());
+
+        if ($request->has('search')) {
+            $query->where('PlantName', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('SortOrder') && $request->has('SortField')) {
+            $order = filter_var($request->SortOrder, FILTER_VALIDATE_BOOLEAN) ? 'asc' : 'desc';
+
+            switch ($request->SortField) {
+                case 'Child Name':
+                    $field = 'PlantName';
+                    break;
+                case 'Species / Varieties':
+                    $field = 'SpeciesVariety';
+                    break;
+                case 'Watering':
+                    $field = 'WaterRequirement';
+                    break;
+                case 'Date Planted':
+                    $field = 'DatePlanted';
+                    break;
+                case 'Soil Type':
+                    $field = 'SoilType';
+                    break;
+                case 'Drainage':
+                    $field = 'Drainage';
+                    break;
+                case 'Fertilizer':
+                    $field = 'Fertilizer';
+                    break;
+                case 'Sunlight':
+                    $field = 'SunLight';
+                    break;
+                case 'Humidity':
+                    $field = 'Humidity';
+                    break;
+                case 'Notes':
+                    $field = 'Notes';
+                    break;
+                default:
+                    $field = null;
+                    break;
+            }
+            if ($field) {
+                $query->orderBy($field, $order);
+            }
+        }
+
         $plants = Plant::where('user_id', Auth::id())->paginate(6);
         return Inertia::render('Dashboard', [
             'plants' => $plants

@@ -9,8 +9,6 @@ import Sun from "./Sun.vue";
 
 const emits = defineEmits(['close']);
 
-const user = usePage().props.auth.user;
-
 const addPlant = useForm({
     plant_pic: null,
     plant_path: "pic.png",

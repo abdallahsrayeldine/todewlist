@@ -11,18 +11,26 @@ import Droplet from '@/Components/Droplet.vue';
 import Prof from '@/Components/Prof.vue';
 import Cursor from '@/Components/Cursor.vue';
 import Edit_plant from '@/Components/Edit_plant.vue';
+import PlantImage from '@/Components/PlantImage.vue';
 
 const user = usePage().props.auth.user;
 
 const showEdit = ref(false);
 const showAdd = ref(false);
 const showEditPlant = ref(false);
+const showImg = ref(false);
 
+const openImg = () => {
+    showImg.value = true;
+};
+const closeImg = () => {
+    showImg.value = false;
+};
 const openEdit = () => {
-    showEdit.value = !showEdit.value;
+    showEdit.value = true
 };
 const openAdd = () => {
-    showAdd.value = !showAdd.value;
+    showAdd.value = true;
 };
 const closeAdd = () => {
     showAdd.value = false;
@@ -34,8 +42,8 @@ const closeEditPlant = () => {
     showEditPlant.value = false;
 };
 function openEditPlant(plant) {
+    Edited_plant.value = plant;
     showEditPlant.value = true;
-    tempPlant.value = { ...plant };
 }
 
 const isHovered = ref(false);
@@ -79,9 +87,9 @@ const props = defineProps({
     picpath: String,
 });
 
-const tempPlant = ref({ ...props.plants.data[0] });
+const Edited_plant = ref();
 
-watch(tempPlant, (newVal, oldVal) => {
+watch(Edited_plant, (newVal, oldVal) => {
     const plantIndex = props.plants.data.findIndex(plant => plant.id === newVal.id);
     if (plantIndex !== -1) {
         props.plants.data[plantIndex] = newVal;
@@ -95,6 +103,12 @@ function activePage(index) {
     props.plants.links[index].active = true;
     window.location.href = props.plants.links[index].url;
 }
+
+const imgLink = ref(null);
+function showFullImage(link) {
+    openImg();
+    imgLink.value = link;
+}
 </script>
 
 <template>
@@ -106,9 +120,9 @@ function activePage(index) {
             <!-- Sidebar -->
             <div class="m-2 bg-grn rounded-3xl p-2 flex flex-col justify-between w-[180px]">
                 <div class="text-center">
-                    <p class="text-biege-light text-5xl rotate-[-5deg]">to-</p>
-                    <p class="text-biege-light text-5xl rotate-[-5deg]">Dew</p>
-                    <p class="text-biege-light text-5xl rotate-[-5deg]">List</p>
+                    <p class="text-biege text-5xl rotate-[-5deg]">to-</p>
+                    <p class="text-biege text-5xl rotate-[-5deg]">Dew</p>
+                    <p class="text-biege text-5xl rotate-[-5deg]">List</p>
                 </div>
                 <div class="flex items-center mb-1">
                     <Prof :imageurl="`${picpath}` ? `storage/${user.picpath}`:`storage/${picpath}`" />
@@ -158,7 +172,8 @@ function activePage(index) {
                                         <div class="flex justify-end items-end">
                                             <div class="w-[45px] h-[45px] ml-2 rounded-sm">
                                                 <img :src="plant.plant_path ? `storage/${plant.plant_path}` : 'storage/pic.png'"
-                                                    class="w-full h-full object-cover rounded-md" />
+                                                    class="w-full h-full object-cover rounded-md"
+                                                    @click="showFullImage(plant.plant_path ? `storage/${plant.plant_path}` : 'storage/pic.png')" />
                                             </div>
                                         </div>
                                     </td>
@@ -232,6 +247,9 @@ function activePage(index) {
         <Plant v-show="showAdd" @close="closeAdd" />
     </div>
     <div v-if="plants.data.length !== 0">
-        <Edit_plant :tempPlant="tempPlant" v-show="showEditPlant" @close="closeEditPlant" />
+        <Edit_plant :tempPlant="Edited_plant" v-show="showEditPlant" @close="closeEditPlant" />
+    </div>
+    <div>
+        <PlantImage :imgLink="imgLink" v-show="showImg" @close="closeImg" />
     </div>
 </template>
