@@ -16,5 +16,5 @@ function moveCursor(e) {
 </script>
 <template>
     <img src="pictures/cursor.svg" id="cursor"
-        class="fixed -translate-x-8 -translate-y-1 w-[5%] h-[5%] pointer-events-none z-10" />
+        class="fixed -translate-x-6 -translate-y-0.5 w-[4%] h-[4%] pointer-events-none z-10" />
 </template>

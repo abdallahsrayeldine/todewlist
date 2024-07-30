@@ -45,11 +45,11 @@ function handleFileChange(event) {
 
 function reset() {
     user.value = usePage().props.auth.user;
-    userForm.name = user.name;
-    userForm.email = user.email;
+    userForm.name = user.value.name;
+    userForm.email = user.value.email;
     userForm.profile_pic = null;
-    userForm.pic_path = user.picpath;
-    filepath.value = user.picpath;
+    userForm.pic_path = user.value.picpath;
+    filepath.value = user.value.picpath;
     fileName.value = "Upload Image";
     passwordForm.current_password = '';
     passwordForm.password = '';
@@ -71,14 +71,7 @@ const updateProfile = () => {
     }
     router.post(route("profile.update"), formData, {
         onSuccess: () => {
-            user.value = usePage().props.auth.user;
-            userForm.name = user.name;
-            userForm.email = user.email;
-            userForm.pic_path = user.picpath;
-            userForm.profile_pic = null;
-            filepath.value = user.picpath;
-            file_upld.value = false;
-            passwordForm.reset();
+            reset();
             emits('close');
         },
         onError: () => {

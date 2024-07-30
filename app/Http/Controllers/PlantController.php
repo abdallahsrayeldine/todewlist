@@ -17,16 +17,7 @@ class PlantController extends Controller
         $plant->user_id = Auth::id(); // Assuming the user is logged in
 
         if ($request->hasFile('plant_pic')) {
-            $path = $request->file('plant_pic')->store('plant_pics', 'public');
-            $plant->plant_path = $path;
-        }
-
-        if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('ProfilePics', 'public');
-            if (!is_null($request->user()->picpath)) {
-                Storage::disk('public')->delete($request->user()->picpath);
-            }
-            $request->user()->picpath = $filePath;
+            $plant->plant_path = $request->file('plant_pic')->store('plant_pics', 'public');
         }
 
         $plant->save();
@@ -76,46 +67,50 @@ class PlantController extends Controller
 
     public function index(Request $request)
     {
-        // dd($request->SortOrder , $request->SortField);
+        // Debugging request parameters
+        // dd($request->OrderType, $request->FieldType);
+
+        // Initialize the query
         $query = Plant::where('user_id', Auth::id());
 
-        if ($request->has('search')) {
-            $query->where('PlantName', 'like', '%' . $request->search . '%');
+        // Apply search filter if present
+        if ($request->has('key')) {
+            $query->where('name', 'like', '%' . $request->input('key') . '%');
         }
 
-        if ($request->has('SortOrder') && $request->has('SortField')) {
-            $order = filter_var($request->SortOrder, FILTER_VALIDATE_BOOLEAN) ? 'asc' : 'desc';
-
-            switch ($request->SortField) {
+        // Apply sorting if OrderType and FieldType are present
+        if ($request->has('OrderType') && $request->has('FieldType')) {
+            $order = filter_var($request->OrderType, FILTER_VALIDATE_BOOLEAN) ? 'asc' : 'desc';
+            switch ($request->FieldType) {
                 case 'Child Name':
-                    $field = 'PlantName';
+                    $field = 'name';
                     break;
-                case 'Species / Varieties':
-                    $field = 'SpeciesVariety';
+                case 'Species/ Varieties':
+                    $field = 'Species';
                     break;
                 case 'Watering':
-                    $field = 'WaterRequirement';
+                    $field = 'water';
                     break;
                 case 'Date Planted':
-                    $field = 'DatePlanted';
+                    $field = 'date';
                     break;
                 case 'Soil Type':
-                    $field = 'SoilType';
+                    $field = 'soil';
                     break;
                 case 'Drainage':
-                    $field = 'Drainage';
+                    $field = 'drainage';
                     break;
                 case 'Fertilizer':
-                    $field = 'Fertilizer';
+                    $field = 'fertilizer';
                     break;
                 case 'Sunlight':
-                    $field = 'SunLight';
+                    $field = 'sunlight';
                     break;
                 case 'Humidity':
-                    $field = 'Humidity';
+                    $field = 'humidity';
                     break;
                 case 'Notes':
-                    $field = 'Notes';
+                    $field = 'notes';
                     break;
                 default:
                     $field = null;
@@ -126,7 +121,7 @@ class PlantController extends Controller
             }
         }
 
-        $plants = Plant::where('user_id', Auth::id())->paginate(6);
+        $plants = $query->paginate(6);
         return Inertia::render('Dashboard', [
             'plants' => $plants
         ]);

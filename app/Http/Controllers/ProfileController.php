@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
-use App\Models\Plant;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,26 +32,24 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request)
     {
+        // dd($request->all());
         $user = $request->user();
-        // $user->fill($request->validated());
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
         // Handle profile picture upload
         if ($request->hasFile('profile_pic')) {
-            $filePath = $request->file('profile_pic')->store('profilePics', 'public');
-            // Update the user's profile picture path in the database
-            $user->picpath = $filePath;
-            // info($filePath);
-        }
-        if ($request->hasFile('profile_pic')) {
             // Delete old user picture if exists
-            if ($user->profile_path) {
-                $path = $user->profile_path;
-                $user->profile_path = $request->file('profile_pic')->store('profilePics', 'public');
-                Storage::disk('public')->delete($path);
-            }
-            // Store new user picture
+            if ($user->picpath) {
+                $path = $user->picpath;
+                if ($path !== "pic.png") {
+                    $user->picpath = $request->file('profile_pic')->store('profilePics', 'public');
+                    Storage::disk('public')->delete($path);
+                } else {
+                    $user->picpath = $request->file('profile_pic')->store('profilePics', 'public');
+                }
+            } // Store new user picture
             else {
-                $path = $request->file('profile_pic')->store('profilePics', 'public');
-                $user->profile_path = $path;
+                $user->picpath = $request->file('profile_pic')->store('profilePics', 'public');
             }
         }
 
@@ -72,31 +69,7 @@ class ProfileController extends Controller
         }
 
         $user->save();
-
-        // $plants = Plant::where('user_id', Auth::id())->get();
-
-        // return Inertia::render('Dashboard', [
-        //     'plants' => $plants,
-        //     'picpath' => $user->picpath
-        // ]);
-
-        // dd($request->all());
-
-        // if ($request->hasFile('file')) {
-        //     $filePath = $request->file('file')->store('prof_pics', 'public');
-        //     if (!is_null($request->user()->picpath)) {
-        //         Storage::disk('public')->delete($request->user()->picpath);
-        //     }
-        //     $request->user()->picpath = $filePath;
-        // }
-
-        // $request->user()->fill($request->validated());
-
-        // if ($request->user()->isDirty('email')) {
-        //     $request->user()->email_verified_at = null;
-        // }
-
-        // $request->user()->save();
+        return back();
     }
 
     /**

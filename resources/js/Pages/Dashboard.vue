@@ -1,5 +1,5 @@
 <script setup>
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import Add from '@/Components/Add.vue';
 import { reactive, ref, watch } from 'vue';
 import UpdateProfileInformationForm from './Profile/Partials/UpdateProfileInformationForm.vue';
@@ -13,12 +13,20 @@ import Cursor from '@/Components/Cursor.vue';
 import Edit_plant from '@/Components/Edit_plant.vue';
 import PlantImage from '@/Components/PlantImage.vue';
 
-const user = usePage().props.auth.user;
-
 const showEdit = ref(false);
 const showAdd = ref(false);
 const showEditPlant = ref(false);
 const showImg = ref(false);
+
+function showPopupSun(active) {
+
+}
+const hidePopup = () => {
+
+}
+function showPopupWater(active) {
+
+}
 
 const openImg = () => {
     showImg.value = true;
@@ -73,22 +81,28 @@ const state = reactive(headers.value.reduce((acc, header) => {
 }, {}));
 
 const active = ref(null);
-
-function rotate(header) {
+function rotateAndSort(header) {
     if (active.value && active.value !== header) {
         state[active.value] = false;
     }
     state[header] = !state[header];
     active.value = state[header] ? header : null;
+
+    const OrderType = state[header];
+    const FieldType = header;
+    router.get(route('plants.index', { OrderType, FieldType }));
+}
+
+const key = ref('');
+const search = () => {
+    router.get(route('plants.index', { key: key.value }));
 }
 
 const props = defineProps({
     plants: Object,
-    picpath: String,
 });
 
 const Edited_plant = ref();
-
 watch(Edited_plant, (newVal, oldVal) => {
     const plantIndex = props.plants.data.findIndex(plant => plant.id === newVal.id);
     if (plantIndex !== -1) {
@@ -125,7 +139,7 @@ function showFullImage(link) {
                     <p class="text-biege text-5xl rotate-[-5deg]">List</p>
                 </div>
                 <div class="flex items-center mb-1">
-                    <Prof :imageurl="`${picpath}` ? `storage/${user.picpath}`:`storage/${picpath}`" />
+                    <Prof :imageurl="`storage/${usePage().props.auth.user.picpath}`" />
                     <div class="flex flex-col items-start ml-2">
                         <p class="mt-2 text-biege-light " @click="openEdit">{{ usePage().props.auth.user.name }}</p>
                         <p class="mt-2 text-ylw " @click="openEdit">Edit profile</p>
@@ -142,7 +156,7 @@ function showFullImage(link) {
                             <img src="pictures/search.svg" class="h-6 w-6" />
                             <input
                                 class="bg-biege text-biege-dark placeholder:text-biege-dark border-transparent outline-none focus:ring-0 focus:border-transparent w-full cursor-none"
-                                placeholder="Search" />
+                                placeholder="Search" @input="search" v-model="key" />
                         </div>
                     </div>
                     <div class="flex-1 overflow-auto">
@@ -151,7 +165,7 @@ function showFullImage(link) {
                                 <tr class="h-[75px]">
                                     <th></th>
                                     <th v-for="header in headers" :key="header"
-                                        class="text-biege-light text-center text-md" @click="rotate(header)">
+                                        class="text-biege-light text-center text-md" @click="rotateAndSort(header)">
                                         {{ header }}
                                         <span :class="[
                                             state[header]
@@ -172,7 +186,7 @@ function showFullImage(link) {
                                         <div class="flex justify-end items-end">
                                             <div class="w-[45px] h-[45px] ml-2 rounded-sm">
                                                 <img :src="plant.plant_path ? `storage/${plant.plant_path}` : 'storage/pic.png'"
-                                                    class="w-full h-full object-cover rounded-md"
+                                                    class="w-full h-full object-cover rounded-lg"
                                                     @click="showFullImage(plant.plant_path ? `storage/${plant.plant_path}` : 'storage/pic.png')" />
                                             </div>
                                         </div>
@@ -180,7 +194,14 @@ function showFullImage(link) {
                                     <td class="text-grn text-center text-md">{{ plant.name }}</td>
                                     <td class="text-brwn text-center text-md">{{ plant.species }}</td>
                                     <td class=" object-center">
-                                        <div class="flex space-x-2 justify-center">
+                                        <div>
+                                            <p
+                                                class=" bg-[url('pictures/bubble1.svg')] text-center h-fit p-2 pt-0 pb-0 text-[#E8FF5B] bg-no-repeat bg-contain">
+                                                hahahah</p>
+                                            <img src="pictures/bubble2.svg" class="mx-auto mb-1" />
+                                        </div>
+                                        <div class="flex space-x-2 justify-center "
+                                            @mouseover="showPopupWater(plant.water)" @mouseleave="hidePopup">
                                             <Droplet v-for="(item, index) in 5" :index="index + 1"
                                                 :activeIndex="plant.water" />
                                         </div>
@@ -190,8 +211,15 @@ function showFullImage(link) {
                                     <td class="text-brwn text-center text-md">{{ plant.soil }}</td>
                                     <td class="text-brwn text-center text-md">{{ plant.drainage }}</td>
                                     <td class="text-brwn text-center text-md">{{ plant.fertilizer }}</td>
-                                    <td class="text-brwn text-center text-md">
-                                        <div class="flex space-x-2 justify-center">
+                                    <td class="object-center">
+                                        <div>
+                                            <p
+                                                class=" bg-[url('pictures/bubble1.svg')] text-center h-fit p-2 pt-0 pb-0 text-[#E8FF5B] bg-no-repeat bg-contain">
+                                                hahahah</p>
+                                            <img src="pictures/bubble2.svg" class="mx-auto mb-1" />
+                                        </div>
+                                        <div class="flex space-x-1 justify-center" @mouseover="showPopupSun(plant.sun)"
+                                            @mouseleave="hidePopup">
                                             <Sun v-for="(item, index) in 5" :index="index + 1"
                                                 :activeIndex="plant.sunlight" />
                                         </div>
