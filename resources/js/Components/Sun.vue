@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue';
 
-// Use defineProps to get props directly
 const props = defineProps({
     index: {
         type: Number,
@@ -14,7 +13,6 @@ const props = defineProps({
     },
 });
 
-// Compute the color based on the index and activeIndex props
 const color = computed(() => (props.index <= props.activeIndex ? '#00992C' : '#DED295'));
 </script>
 

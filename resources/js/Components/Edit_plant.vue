@@ -105,7 +105,7 @@ function Update() {
             reset();
         },
         onError: (errors) => {
-            console.error(errors); // Add error logging for debugging
+            console.error(errors);
         }
     });
 }

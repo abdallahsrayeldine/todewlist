@@ -26,10 +26,10 @@ class PlantController extends Controller
     {
         // dd($request->all());
 
-        $plant = Plant::findOrFail($id); // Find the plant by its ID
+        $plant = Plant::findOrFail($id);
 
         if ($plant->user_id !== Auth::id()) {
-            abort(403); // Ensure the plant belongs to the authenticated user
+            abort(403);
         }
         $plant->name = $request->input('name');
         $plant->species = $request->input('species');
@@ -43,7 +43,6 @@ class PlantController extends Controller
         $plant->notes = $request->input('notes');
 
         if ($request->hasFile('plant_pic')) {
-            // Delete old plant picture if exists
             if ($plant->plant_path) {
                 $path = $plant->plant_path;
                 if ($path !== "pic.png") {
@@ -52,23 +51,18 @@ class PlantController extends Controller
                 } else {
                     $plant->plant_path = $request->file('plant_pic')->store('plant_pics', 'public');
                 }
-            }
-            // Store new plant picture
-            else {
+            } else {
                 $path = $request->file('plant_pic')->store('plant_pics', 'public');
                 $plant->plant_path = $path;
             }
         }
-        // Save changes
         $plant->save();
     }
 
     public function index(Request $request)
     {
-        // Initialize the query
         $query = Plant::where('user_id', Auth::id());
 
-        // Apply search filter if present
         if ($request->has('key')) {
             $query->where(function ($query) use ($request) {
                 $query->where('name', 'like', "%{$request->input('key')}%")
@@ -84,7 +78,6 @@ class PlantController extends Controller
             });
         }
 
-        // Apply sorting if OrderType and FieldType are present
         if ($request->has('OrderType') && $request->has('FieldType')) {
             $order = $request->OrderType;
             $fieldMap = [

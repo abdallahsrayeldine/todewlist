@@ -32,7 +32,7 @@ function handleFileChange(event) {
         const file = input.files[0];
         fileName.value = file.name;
         userForm.profile_pic = file;
-        // Read the file and save the path
+
         const reader = new FileReader();
         reader.onload = function (e) {
             userForm.pic_path = file.name;

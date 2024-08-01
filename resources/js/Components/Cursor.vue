@@ -4,7 +4,6 @@ const cursorPositionKey = 'cursorPosition';
 
 onMounted(() => {
     const cursor = document.getElementById("cursor");
-    // Retrieve and set the cursor's last known position
     const storedPosition = localStorage.getItem(cursorPositionKey);
     if (storedPosition) {
         const { x, y } = JSON.parse(storedPosition);
@@ -13,12 +12,10 @@ onMounted(() => {
             cursor.style.top = `${y}px`;
         }
     }
-    // Attach the event listener for mouse movements
     document.addEventListener("mousemove", moveCursor);
 });
 
 onBeforeUnmount(() => {
-    // Remove the event listener when the component is unmounted
     document.removeEventListener("mousemove", moveCursor);
 });
 
@@ -29,7 +26,6 @@ function moveCursor(e) {
         const y = e.clientY;
         cursor.style.left = `${x}px`;
         cursor.style.top = `${y}px`;
-        // Store the cursor's position in localStorage
         localStorage.setItem(cursorPositionKey, JSON.stringify({ x, y }));
     }
 }

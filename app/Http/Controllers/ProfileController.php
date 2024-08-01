@@ -36,9 +36,7 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->name = $request->input('name');
         $user->email = $request->input('email');
-        // Handle profile picture upload
         if ($request->hasFile('profile_pic')) {
-            // Delete old user picture if exists
             if ($user->picpath) {
                 $path = $user->picpath;
                 if ($path !== "pic.png") {
@@ -47,13 +45,11 @@ class ProfileController extends Controller
                 } else {
                     $user->picpath = $request->file('profile_pic')->store('profilePics', 'public');
                 }
-            } // Store new user picture
-            else {
+            } else {
                 $user->picpath = $request->file('profile_pic')->store('profilePics', 'public');
             }
         }
 
-        // Clear email verification if email is updated
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
