@@ -148,7 +148,6 @@ function showFullImage(link) {
     <Cursor />
     <div class="absolute inset-0 overflow-hidden bg-biege-light">
         <div class="flex h-full w-full">
-            <!-- Sidebar -->
             <div class="m-2 bg-grn rounded-3xl p-2 flex flex-col justify-between w-[180px]">
                 <div class="text-center">
                     <p class="text-biege text-5xl rotate-[-5deg]">to-</p>
@@ -164,7 +163,6 @@ function showFullImage(link) {
                 </div>
             </div>
 
-            <!-- Main Content -->
             <div class="flex flex-col justify-between w-full h-full mr-2 overflow-hidden">
                 <div class="flex flex-col h-full">
                     <div class="flex justify-between items-center mt-[1.7rem] mb-1">
