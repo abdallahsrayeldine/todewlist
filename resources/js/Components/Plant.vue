@@ -1,6 +1,6 @@
 <script setup>
-import { ref, reactive } from "vue";
-import { useForm, usePage } from '@inertiajs/vue3';
+import { ref } from "vue";
+import { useForm } from '@inertiajs/vue3';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';

@@ -18,15 +18,15 @@ const showAdd = ref(false);
 const showEditPlant = ref(false);
 const showImg = ref(false);
 
-function showPopupSun(active) {
+// function showPopupSun(active) {
 
-}
-const hidePopup = () => {
+// }
+// const hidePopup = () => {
 
-}
-function showPopupWater(active) {
+// }
+// function showPopupWater(active) {
 
-}
+// }
 
 const openImg = () => {
     showImg.value = true;
@@ -211,12 +211,12 @@ function showFullImage(link) {
                                     <td class="text-grn text-center text-md">{{ plant.name }}</td>
                                     <td class="text-brwn text-center text-md">{{ plant.species }}</td>
                                     <td class=" object-center">
-                                        <div>
+                                        <!-- <div>
                                             <p
                                                 class=" bg-[url('pictures/bubble1.svg')] text-center h-fit p-2 pt-0 pb-0 text-[#E8FF5B] bg-no-repeat bg-contain">
                                                 hahahah</p>
                                             <img src="pictures/bubble2.svg" class="mx-auto mb-1" />
-                                        </div>
+                                        </div> -->
                                         <div class="flex space-x-2 justify-center "
                                             @mouseover="showPopupWater(plant.water)" @mouseleave="hidePopup">
                                             <Droplet v-for="(item, index) in 5" :index="index + 1"
@@ -229,12 +229,12 @@ function showFullImage(link) {
                                     <td class="text-brwn text-center text-md">{{ plant.drainage }}</td>
                                     <td class="text-brwn text-center text-md">{{ plant.fertilizer }}</td>
                                     <td class="object-center">
-                                        <div>
+                                        <!-- <div>
                                             <p
                                                 class=" bg-[url('pictures/bubble1.svg')] text-center h-fit p-2 pt-0 pb-0 text-[#E8FF5B] bg-no-repeat bg-contain">
                                                 hahahah</p>
                                             <img src="pictures/bubble2.svg" class="mx-auto mb-1" />
-                                        </div>
+                                        </div> -->
                                         <div class="flex space-x-1 justify-center" @mouseover="showPopupSun(plant.sun)"
                                             @mouseleave="hidePopup">
                                             <Sun v-for="(item, index) in 5" :index="index + 1"

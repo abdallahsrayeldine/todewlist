@@ -107,7 +107,7 @@ class PlantController extends Controller
             }
         }
 
-        $plants = $query->paginate(6);
+        $plants = $query->paginate(6)->withQueryString();
         return Inertia::render('Dashboard', [
             'plants' => $plants
         ]);
