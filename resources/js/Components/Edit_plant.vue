@@ -36,7 +36,7 @@ function initializeForm() {
             fertilizer: props.tempPlant.fertilizer,
             sunlight: props.tempPlant.sunlight,
             humidity: props.tempPlant.humidity,
-            notes: props.tempPlant.notes,
+            notes: props.tempPlant.notes || '',
         });
     }
 }

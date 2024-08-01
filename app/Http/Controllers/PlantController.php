@@ -61,61 +61,47 @@ class PlantController extends Controller
         }
         // Save changes
         $plant->save();
-
-        // return response()->json(['success' => true, 'message' => 'Plant updated successfully']);
     }
 
     public function index(Request $request)
     {
-        // Debugging request parameters
-        // dd($request->OrderType, $request->FieldType);
-
         // Initialize the query
         $query = Plant::where('user_id', Auth::id());
 
         // Apply search filter if present
         if ($request->has('key')) {
-            $query->where('name', 'like', '%' . $request->input('key') . '%');
+            $query->where(function ($query) use ($request) {
+                $query->where('name', 'like', "%{$request->input('key')}%")
+                    ->orWhere('species', 'like', "%{$request->input('key')}%")
+                    ->orWhere('water', 'like', "%{$request->input('key')}%")
+                    ->orWhere('date', 'like', "%{$request->input('key')}%")
+                    ->orWhere('soil', 'like', "%{$request->input('key')}%")
+                    ->orWhere('drainage', 'like', "%{$request->input('key')}%")
+                    ->orWhere('fertilizer', 'like', "%{$request->input('key')}%")
+                    ->orWhere('sunlight', 'like', "%{$request->input('key')}%")
+                    ->orWhere('humidity', 'like', "%{$request->input('key')}%")
+                    ->orWhere('notes', 'like', "%{$request->input('key')}%");
+            });
         }
 
         // Apply sorting if OrderType and FieldType are present
         if ($request->has('OrderType') && $request->has('FieldType')) {
-            $order = filter_var($request->OrderType, FILTER_VALIDATE_BOOLEAN) ? 'asc' : 'desc';
-            switch ($request->FieldType) {
-                case 'Child Name':
-                    $field = 'name';
-                    break;
-                case 'Species/ Varieties':
-                    $field = 'Species';
-                    break;
-                case 'Watering':
-                    $field = 'water';
-                    break;
-                case 'Date Planted':
-                    $field = 'date';
-                    break;
-                case 'Soil Type':
-                    $field = 'soil';
-                    break;
-                case 'Drainage':
-                    $field = 'drainage';
-                    break;
-                case 'Fertilizer':
-                    $field = 'fertilizer';
-                    break;
-                case 'Sunlight':
-                    $field = 'sunlight';
-                    break;
-                case 'Humidity':
-                    $field = 'humidity';
-                    break;
-                case 'Notes':
-                    $field = 'notes';
-                    break;
-                default:
-                    $field = null;
-                    break;
-            }
+            $order = $request->OrderType;
+            $fieldMap = [
+                'Child Name' => 'name',
+                'Species/ Varieties' => 'species',
+                'Watering' => 'water',
+                'Date Planted' => 'date',
+                'Soil Type' => 'soil',
+                'Drainage' => 'drainage',
+                'Fertilizer' => 'fertilizer',
+                'Sunlight' => 'sunlight',
+                'Humidity' => 'humidity',
+                'Notes' => 'notes'
+            ];
+
+            $field = $fieldMap[$request->FieldType] ?? null;
+
             if ($field) {
                 $query->orderBy($field, $order);
             }
@@ -125,5 +111,11 @@ class PlantController extends Controller
         return Inertia::render('Dashboard', [
             'plants' => $plants
         ]);
+    }
+
+    public function show($plantId)
+    {
+        $plant = Plant::findOrFail($plantId);
+        return $plant;
     }
 }

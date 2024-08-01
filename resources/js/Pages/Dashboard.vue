@@ -1,7 +1,7 @@
 <script setup>
-import { Head, router, useForm, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import Add from '@/Components/Add.vue';
-import { reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import UpdateProfileInformationForm from './Profile/Partials/UpdateProfileInformationForm.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Tree from '@/Components/Tree.vue';
@@ -76,27 +76,44 @@ const headers = ref([
 ]);
 
 const state = reactive(headers.value.reduce((acc, header) => {
-    acc[header] = false;
+    acc[header] = '';
     return acc;
 }, {}));
 
+const searchParams = new URLSearchParams(window.location.search);
 const active = ref(null);
-function rotateAndSort(header) {
-    if (active.value && active.value !== header) {
-        state[active.value] = false;
-    }
-    state[header] = !state[header];
-    active.value = state[header] ? header : null;
+const orderType = ref(searchParams.get('OrderType') || '');
+const fieldType = ref(searchParams.get('FieldType') || '');
 
-    const OrderType = state[header];
-    const FieldType = header;
-    router.get(route('plants.index', { OrderType, FieldType }));
+if (fieldType.value) {
+    state[fieldType.value] = orderType.value;
+    active.value = state[fieldType.value] ? fieldType.value : null;
+    rotate(fieldType.value)
 }
 
-const key = ref('');
+function rotate(header) {
+    if (active.value && active.value !== header) {
+        state[active.value] = '';
+    }
+    state[header] = state[header] === 'asc' ? 'desc' : 'asc';
+    active.value = state[header] === 'asc' ? header : null;
+}
+function sort(header) {
+    if (state[header] === '') state[header] = 'asc';
+    router.get(route('plants.index', { OrderType: state[header], FieldType: header }));
+    rotate(header);
+}
+
+const Input = ref(null);
+const key = ref(searchParams.get('key') || '');
 const search = () => {
     router.get(route('plants.index', { key: key.value }));
 }
+onMounted(() => {
+    if (true) {
+        Input.value.focus();
+    }
+});
 
 const props = defineProps({
     plants: Object,
@@ -156,7 +173,7 @@ function showFullImage(link) {
                             <img src="pictures/search.svg" class="h-6 w-6" />
                             <input
                                 class="bg-biege text-biege-dark placeholder:text-biege-dark border-transparent outline-none focus:ring-0 focus:border-transparent w-full cursor-none"
-                                placeholder="Search" @input="search" v-model="key" />
+                                placeholder="Search" @input="search" v-model="key" ref="Input" />
                         </div>
                     </div>
                     <div class="flex-1 overflow-auto">
@@ -165,10 +182,10 @@ function showFullImage(link) {
                                 <tr class="h-[75px]">
                                     <th></th>
                                     <th v-for="header in headers" :key="header"
-                                        class="text-biege-light text-center text-md" @click="rotateAndSort(header)">
+                                        class="text-biege-light text-center text-md" @click="sort(header)">
                                         {{ header }}
                                         <span :class="[
-                                            state[header]
+                                            state[header]==='desc'
                                             ? 'rotate-90 text-ylw'
                                             : 'rotate-0 text-biege-light',
                                             'inline-block duration-200 transition-all text-2xl  ',
@@ -236,7 +253,7 @@ function showFullImage(link) {
                         <div v-show="plants.data.length === 0" class="w-[35%] h-[50%] ml-auto mr-auto">
                             <br>
                             <br>
-                            <Tree class="bg-[url('/pictures/oval.svg')] relative ml-auto mr-auto bg-no-repeat" />
+                            <Tree class="bg-[url('pictures/oval.svg')] relative ml-auto mr-auto bg-no-repeat" />
                             <p class="font-IrishGrover text-center text-2xl text-[#40341D]">
                                 You don't have any Plants in
                             </p>
@@ -252,7 +269,7 @@ function showFullImage(link) {
                             <div v-for="link in plants.links" :key="link.label">
                                 <div class="text-biege-dark text-2xl px-3 bg-cover bg-no-repeat"
                                     v-if="Number.isInteger(parseInt(link.label))"
-                                    :class=" {'text-biege-light bg-[url(\'pictures/hover2.svg\')]': link.active,'hover:bg-[url(\'pictures/hover.svg\')] hover:text-biege-dark': !link.active}"
+                                    :class=" {'text-biege-light bg-[url(pictures/hover2.svg)]': link.active,'hover:bg-[url(pictures/hover.svg)] hover:text-biege-dark': !link.active}"
                                     @click="activePage(parseInt(link.label))">
                                     {{ link.label }}
                                 </div>
