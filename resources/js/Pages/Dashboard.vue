@@ -100,14 +100,14 @@ function rotate(header) {
 }
 function sort(header) {
     if (state[header] === '') state[header] = 'asc';
-    router.get(route('plants.index', { OrderType: state[header], FieldType: header }));
+    router.get(route('plants.index', { OrderType: state[header], FieldType: header, key: key.value }));
     rotate(header);
 }
 
 const Input = ref(null);
 const key = ref(searchParams.get('key') || '');
 const search = () => {
-    router.get(route('plants.index', { key: key.value }));
+    router.get(route('plants.index', { key: key.value, OrderType: orderType.value, FieldType: fieldType.value }));
 }
 onMounted(() => {
     if (true) {
